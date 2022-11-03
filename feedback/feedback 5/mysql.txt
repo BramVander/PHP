@@ -1,0 +1,39 @@
+CREATE DATABASE lidmaatschap;
+USE lidmaatschap;
+
+// Tabel Lid, met (lidnummer(PK), naam, voornaam, postcode(FK), huisnummer)
+CREATE TABLE leden(
+    lidnummer INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    naam varchar(128),
+    postcode varchar(6),
+    huisnummer varchar(6),
+    PRIMARY KEY(lidnummer),
+    FOREIGN KEY(postcode) REFERENCES postcode(postcode)
+    ON DELETE CASCADE
+);
+
+// Tabel Telefoonnummers (telefoonnummer(PK), lidnummer(FK))
+CREATE TABLE telefoon(
+    telefoonnummer char(25),
+    lidnummer INT UNSIGNED NOT NULL,
+    PRIMARY KEY(telefoonnummer),
+    FOREIGN KEY(lidnummer) REFERENCES leden(lidnummer)
+    ON DELETE CASCADE
+);
+
+// Tabel e-mail (emailadres(PK), lidnummer(FK))
+CREATE TABLE email(
+    email varchar(128),
+    lidnummer INT UNSIGNED NOT NULL,
+    PRIMARY KEY(email),
+    FOREIGN KEY(lidnummer) REFERENCES leden(lidnummer)
+    ON DELETE CASCADE
+);
+
+// Tabel Postcode (postcode(PK), adres, woonplaats)
+CREATE TABLE postcode(
+    postcode varchar(6),
+    adres varchar(128),
+    woonplaats varchar(128),
+    PRIMARY KEY(postcode)
+);
