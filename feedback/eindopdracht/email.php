@@ -23,6 +23,7 @@
               <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/email.php">Email toevoegen</a>
               <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/telefoon.php">Telefoon toevoegen</a>
               <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/teams.php">Team samenstellen</a>
+              <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="remove.php">Teamleden verwijderen</a>
             </nav>
     _END;
 
@@ -62,9 +63,7 @@
   $query = "SELECT * FROM leden";
   $result = $conn->query($query);
   if(!$result) die('lidnr query failed');
-
   $lidnrRows = $result->num_rows;
-
   for($i = 0; $i < $lidnrRows; ++$i) {
     $lidnrRow = $result->fetch_array(MYSQLI_NUM);
     // lidnr column is at lidnrRow[0]
@@ -87,7 +86,6 @@ echo <<<_END
   </body>
   </html>
 _END;
-
 
 function sanitizeString($string) {
     if(get_magic_quotes_gpc())

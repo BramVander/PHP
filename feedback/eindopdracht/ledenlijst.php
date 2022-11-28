@@ -22,6 +22,7 @@ echo <<<_END
         <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/email.php">Email toevoegen</a>
         <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/telefoon.php">Telefoon toevoegen</a>
         <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/teams.php">Team samenstellen</a>
+        <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="remove.php">Teamleden verwijderen</a>
       </nav>
 _END;
 
@@ -51,13 +52,13 @@ if(!$zipResult) die('zipQuery failed');
 $zipRows = $zipResult->num_rows;
 
 for($i = 0; $i < $zipRows; ++$i) {
-$zipRow = $zipResult->fetch_array(MYSQLI_NUM);
-// postcode column is at zipRow[0]
-$zip = htmlspecialchars($zipRow[0]);
-// we echo the result inside of the loop
-echo <<<_END
-<option value="$zip">$zip</option>
-_END;
+  $zipRow = $zipResult->fetch_array(MYSQLI_NUM);
+  // postcode column is at zipRow[0]
+  $zip = htmlspecialchars($zipRow[0]);
+  // we echo the result inside of the loop
+  echo <<<_END
+  <option value="$zip">$zip</option>
+  _END;
 }
 
 // outside the loop we continue with echoing the HTML
@@ -124,11 +125,9 @@ for($i = 0; $i < $rows; ++$i) {
 
 if(isset($_POST['delete'])) {
   $lidnr = mysql_entities_fix_string($conn, $_POST['delete']);
-  
   // reopen connection after $conn->close();
   $conn = new mysqli($hn, $un, $pw, $db);
   if($conn->connect_error) die('Fatal error');
-  
   $query = "DELETE FROM leden WHERE lidnummer=$lidnr";
   $result = $conn->query($query);
   if(!$result) die('delete query failed');

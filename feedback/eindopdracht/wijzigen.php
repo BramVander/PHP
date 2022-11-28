@@ -22,5 +22,76 @@ echo <<<_END
         <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/email.php">Email toevoegen</a>
         <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/telefoon.php">Telefoon toevoegen</a>
         <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/teams.php">Team samenstellen</a>
+        <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="remove.php">Teamleden verwijderen</a>
       </nav>
 _END;
+
+
+echo <<<_END
+<form action="" method="post" style="padding: 30px;"><pre>
+Lidnummer       <select name="lidnummer" id="lidnummer" required>
+_END;
+
+// set up query for lidnr dropdown
+$query = "SELECT * FROM leden";
+$result = $conn->query($query);
+if(!$result) die('lidnr query failed');
+
+$lidnrRows = $result->num_rows;
+
+for($i = 0; $i < $lidnrRows; ++$i) {
+    $lidnrRow = $result->fetch_array(MYSQLI_NUM);
+    // lidnr column is at lidnrRow[0]
+    $lidnr = htmlspecialchars($lidnrRow[0]);
+    $voornaam = htmlspecialchars($lidnrRow[1]);
+    $achternaam = htmlspecialchars($lidnrRow[2]);
+    // we echo the result inside of the loop
+    echo <<<_END
+    <option value="$lidnr">#$lidnr $voornaam $achternaam</option>
+    _END;
+}
+
+// outside the loop we continue with echoing the HTML
+echo <<<_END
+</select>
+<br>
+  <label>Voornaam
+    <input name="voornaam" type="text" required>
+  </label>
+  <label>Achternaam
+    <input name="achternaam" type="text" required>
+  </label>
+  <label>Postcode
+    <input name="postcode" type="text" required>
+  </label>
+  <label>Huisnummer
+    <input name="huisnummer" type="text" required>
+  </label>
+
+  <input type="submit" value="Lid aanpassen">
+  </form>
+_END;
+
+if(isset($_POST['lidnummer'])  &&
+   isset($_POST['voornaam'])   &&
+   isset($_POST['achternaam']) &&
+   isset($_POST['postcode'])   &&
+   isset($_POST['huisnummer'])) {
+    $lidnummer = sanitizeString($_POST['lidnummer']);
+    $voornaam = sanitizeString($_POST['voornaam']);
+    $achternaam = sanitizeString($_POST['achternaam']);
+    $postcode = sanitizeString($_POST['postcode']);
+    $huisnummer = sanitizeString($_POST['huisnummer']);
+
+    $query = "UPDATE leden SET voornaam='$voornaam', achternaam='$achternaam', huisnummer='$huisnummer' WHERE lidnummer='$lidnummer'";
+    $conn->query($query);
+    echo 'succesfully edited';
+}
+
+function sanitizeString($string) {
+if(get_magic_quotes_gpc())
+    $string = stripslashes($string);
+$string = strip_tags($string);
+$string = htmlentities($string);
+return $string;
+}
