@@ -27,9 +27,6 @@ echo <<<_END
 _END;
 
 $teamnamen = [];
-$lorem = [];
-$pokemon = [];
-$zelda = [];
 
 $query = "SELECT teamnaam FROM teams";
 $result = $conn->query($query);
@@ -38,113 +35,53 @@ if(!$result) die('lidnr query failed');
 $rows = $result->num_rows;
 for($i = 0; $i < $rows; ++$i) {
     $teamnaam = $result->fetch_array(MYSQLI_NUM);
-    array_push($teamnamen, $teamnaam);
+    array_push($teamnamen, $teamnaam[0]);
 }
 
-// tried fixing in loop
-// loop worked for lorem
-// loop added lorem members to pokemon members as well
-// loop added lorem members and pokemon members to zelda as well
-// it adds previous results ??
-
-// fetch members ids loremIpsum
-$query = "SELECT lidnummer FROM teamlid WHERE teamnaam='LoremIpsum'";
-$result = $conn->query($query);
-if(!$result) die('fatal error teamnaam[0]');
-$rows = $result->num_rows;
-for($i = 0; $i < $rows; ++$i) {
-    $lidnr = $result->fetch_array(MYSQLI_NUM);
-    array_push($lorem, $lidnr);
-}
-
-// fetch members pokemon
-$query = "SELECT lidnummer FROM teamlid WHERE teamnaam='Pokemon'";
-$result = $conn->query($query);
-if(!$result) die('fatal error teamnaam[0]');
-$rows = $result->num_rows;
-for($i = 0; $i < $rows; ++$i) {
-    $lidnr = $result->fetch_array(MYSQLI_NUM);
-    array_push($pokemon, $lidnr);
-}
-
-// fetch member ids zelda
-$query = "SELECT lidnummer FROM teamlid WHERE teamnaam='Zelda'";
-$result = $conn->query($query);
-if(!$result) die('fatal error teamnaam[0]');
-$rows = $result->num_rows;
-for($i = 0; $i < $rows; ++$i) {
-    $lidnr = $result->fetch_array(MYSQLI_NUM);
-    array_push($zelda, $lidnr);
-}
-
-echo '<br>';
-echo '<h1>LoremIpsum team</h1>';
-
-// fetch names for lorem
-foreach($lorem as $lid) {
-    $query = "SELECT voornaam, achternaam FROM leden WHERE lidnummer='$lid[0]'";
+foreach($teamnamen as $teamnaam) {
+    echo <<<_END
+    <h1>$teamnaam</h1>
+    _END;
+    $lidnrs = [];
+    $query = "SELECT lidnummer FROM teamlid WHERE teamnaam='$teamnaam'";
     $result = $conn->query($query);
-    if(!$result) die('lorem error');
+    if(!$result) die('fatal error teamnaam[0]');
     $rows = $result->num_rows;
     for($i = 0; $i < $rows; ++$i) {
-        $naam = $result->fetch_array(MYSQLI_NUM);
-        echo $lid[0] . ' ' . sanitizeString($naam[0]) . ' ' .  sanitizeString($naam[1]) . '<br>';
-        echo <<<_END
-        <form method="post" action="">
-        <input type="submit" value="VERWIJDER LID VAN TEAM" style="background-color: indianred; color: white; border: none; border-radius: 5px; padding: 10px; cursor: pointer;">
-        <input type="hidden" name="deletefromteam" value=$lidnr[0]>
-        </form>
-        _END;
+        $lidnr = $result->fetch_array(MYSQLI_NUM);
+        array_push($lidnrs, $lidnr);
     }
-}
-
-echo '<br>';
-echo '<h1>Pokemon team</h1>';
-
-// fetch names for pokemon
-foreach($pokemon as $lid) {
-    $query = "SELECT voornaam, achternaam FROM leden WHERE lidnummer='$lid[0]'";
-    $result = $conn->query($query);
-    if(!$result) die('lorem error');
-    $rows = $result->num_rows;
-    for($i = 0; $i < $rows; ++$i) {
-        $naam = $result->fetch_array(MYSQLI_NUM);
-        echo $lid[0] . ' ' . sanitizeString($naam[0]) . ' ' .  sanitizeString($naam[1]) . '<br>';
-        echo <<<_END
-        <form method="post" action="">
-        <input type="submit" value="VERWIJDER LID VAN TEAM" style="background-color: indianred; color: white; border: none; border-radius: 5px; padding: 10px; cursor: pointer;">
-        <input type="hidden" name="deletefromteam" value=$lidnr[0]>
-        </form>
-        _END;
-    }
-}
-
-echo '<br>';
-echo '<h1>Zelda team</h1>';
-
-// fetch names for zelda
-foreach($zelda as $lid) {
-    $query = "SELECT voornaam, achternaam FROM leden WHERE lidnummer='$lid[0]'";
-    $result = $conn->query($query);
-    if(!$result) die('lorem error');
-    $rows = $result->num_rows;
-    for($i = 0; $i < $rows; ++$i) {
-        $naam = $result->fetch_array(MYSQLI_NUM);
-        echo $lid[0] . ' ' . sanitizeString($naam[0]) . ' ' .  sanitizeString($naam[1]) . '<br>';
-        echo <<<_END
-        <form method="post" action="">
-        <input type="submit" value="VERWIJDER LID VAN TEAM" style="background-color: indianred; color: white; border: none; border-radius: 5px; padding: 10px; cursor: pointer;">
-        <input type="hidden" name="deletefromteam" value=$lidnr[0]>
-        </form>
-        _END;
+    foreach($lidnrs as $lid) {
+        $query = "SELECT voornaam, achternaam FROM leden WHERE lidnummer='$lid[0]'";
+        $result = $conn->query($query);
+        if(!$result) die('lorem error');
+        $rows = $result->num_rows;
+        for($i = 0; $i < $rows; ++$i) {
+            $naam = $result->fetch_array(MYSQLI_NUM);
+            echo $lid[0] . ' ' . sanitizeString($naam[0]) . ' ' .  sanitizeString($naam[1]) . '<br>';
+            echo <<<_END
+            <form method="post" action="">
+            <input type="submit" value="VERWIJDER LID VAN TEAM" style="background-color: indianred; color: white; border: none; border-radius: 5px; padding: 10px; cursor: pointer;">
+            <input type="hidden" name="deletenr" value=$lid[0]>
+            <input type="hidden" name="deletefromteam" value=$teamnaam>
+            </form>
+            _END;
+        }
     }
 }
 
 // delete from team
 if(isset($_POST['deletefromteam'])) {
-    $query = "DELETE FROM teamlid WHERE lidnummer='$lidnr[0]'";
-    $result = $conn->query($query);
-    if(!$result) die('delete query fail');
+    $deleteNr = $_POST['deletenr'];
+    $deleteFromTeam = $_POST['deletefromteam'];
+    echo 'delete nr ' . $deleteNr . '<br>';
+    echo 'deletefromteam ' . $deleteFromTeam . '<br>';
+    $deleteQuery = "DELETE FROM teamlid WHERE lidnummer='$deleteNr' AND teamnaam='$deleteFromTeam'";
+    $deleteResult = $conn->query($deleteQuery);
+    if(!$deleteResult) die('delete query fail');
+    // prevent refresh data insertion
+    unset($_POST);
+    ?> <script>window.location.href = '/feedback/eindopdracht/remove.php';</script> <?php
     echo 'removed succesfully';
 }
 

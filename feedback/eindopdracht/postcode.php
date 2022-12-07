@@ -29,7 +29,7 @@
     // sanitize
     // write to according variable
     if (isset($_POST['postcode'])    &&
-        isset($_POST['adres'])      &&
+        isset($_POST['adres'])       &&
         isset($_POST['woonplaats'])) {
             $postcode   = mysql_entities_fix_string($link, $_POST['postcode']);
             $adres      = mysql_entities_fix_string($link, $_POST['adres']);
