@@ -4,7 +4,9 @@ require_once 'login.php';
 $conn = new mysqli($hn, $un, $pw, $db);
 if($conn->connect_error) die('Fatal error');
 
-echo <<<_END
+if(isset($_COOKIE['un']) &&
+   isset($_COOKIE['pw'])) {
+    echo <<<_END
 <html>
   <head>
     <title>Vereniging</title>
@@ -76,9 +78,9 @@ echo <<<_END
 <div style="display: flex; flex-direction: row; gap: 20px; flex-wrap: wrap;">
 _END;
 
-if(isset($_POST['voornaam'])   &&
-   isset($_POST['achternaam']) &&
-   isset($_POST['huisnummer'])) {
+  if(isset($_POST['voornaam'])   &&
+     isset($_POST['achternaam']) &&
+     isset($_POST['huisnummer'])) {
     $voornaam   = mysql_entities_fix_string($conn, $_POST['voornaam']);
     $achternaam = mysql_entities_fix_string($conn, $_POST['achternaam']);
     $huisnummer = mysql_entities_fix_string($conn, $_POST['huisnummer']);
@@ -94,44 +96,48 @@ if(isset($_POST['voornaam'])   &&
   $stmt->close();
   $conn->close();
 
-// loop through results to display members
-for($i = 0; $i < $rows; ++$i) {
-    // assign records from result to row
-    $row = $result->fetch_array(MYSQLI_NUM);
-    // lidnummer column is at row[0]
-    $r0 = htmlspecialchars($row[0]);
-    // voornaam column is at row[1]
-    $r1 = htmlspecialchars($row[1]);
-    // achternaam column is at row[2]
-    $r2 = htmlspecialchars($row[2]);
-    // postcode column is at row[3]
-    $r3 = htmlspecialchars($row[3]);
-    // huisnummer column is at row[4]
-    $r4 = htmlspecialchars($row[4]);
+  // loop through results to display members
+  for($i = 0; $i < $rows; ++$i) {
+      // assign records from result to row
+      $row = $result->fetch_array(MYSQLI_NUM);
+      // lidnummer column is at row[0]
+      $r0 = htmlspecialchars($row[0]);
+      // voornaam column is at row[1]
+      $r1 = htmlspecialchars($row[1]);
+      // achternaam column is at row[2]
+      $r2 = htmlspecialchars($row[2]);
+      // postcode column is at row[3]
+      $r3 = htmlspecialchars($row[3]);
+      // huisnummer column is at row[4]
+      $r4 = htmlspecialchars($row[4]);
 
-    echo <<<_END
-    <pre style="background-color: lavender; width: 325px;">
-    <form method="post" action="">
-      Lidnummer:    $r0
-      Voornaam:     $r1
-      Achternaam:   $r2
-      Postcode:     $r3
-      Huisnummer:   $r4
-      <input type='hidden' name='delete' value=$r0>
-      <input type="submit" value="VERWIJDER LID" style="color: white; background-color: indianred; border: none; border-radius: 5px; padding: 15px; cursor: pointer;">
-    </form></pre>
-    _END;
+      echo <<<_END
+      <pre style="background-color: lavender; width: 325px;">
+      <form method="post" action="">
+        Lidnummer:    $r0
+        Voornaam:     $r1
+        Achternaam:   $r2
+        Postcode:     $r3
+        Huisnummer:   $r4
+        <input type='hidden' name='delete' value=$r0>
+        <input type="submit" value="VERWIJDER LID" style="color: white; background-color: indianred; border: none; border-radius: 5px; padding: 15px; cursor: pointer;">
+      </form></pre>
+      _END;
+  }
+
+  if(isset($_POST['delete'])) {
+    $lidnr = mysql_entities_fix_string($conn, $_POST['delete']);
+    // reopen connection after $conn->close();
+    $conn = new mysqli($hn, $un, $pw, $db);
+    if($conn->connect_error) die('Fatal error');
+    $query = "DELETE FROM leden WHERE lidnummer=$lidnr";
+    $result = $conn->query($query);
+    if(!$result) die('delete query failed');
+  }
+} else {
+header("Location: home.php");
 }
 
-if(isset($_POST['delete'])) {
-  $lidnr = mysql_entities_fix_string($conn, $_POST['delete']);
-  // reopen connection after $conn->close();
-  $conn = new mysqli($hn, $un, $pw, $db);
-  if($conn->connect_error) die('Fatal error');
-  $query = "DELETE FROM leden WHERE lidnummer=$lidnr";
-  $result = $conn->query($query);
-  if(!$result) die('delete query failed');
-}
 
 // sanitize functions
 function mysql_entities_fix_string($conn, $string)

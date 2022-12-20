@@ -4,70 +4,75 @@ require_once 'login.php';
 $conn = new mysqli($hn, $un, $pw, $db);
 if($conn->connect_error) die('Fatal error');
 
-echo <<<_END
-<html>
-  <head>
-    <title>Vereniging</title>
-  </head>
-  <body>
-    <pre>
-      <div style="color: white; background-color: grey; display: flex; justify-content: center; padding: 30px; font-size: 30px;">
-        <b>Welkom bij de ledenlijst van onze vereniging</b>
-      </div>
-      <nav style="display: flex; justify-content: space-evenly; margin-bottom: 30px;">
-        <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="home.php">Home</a>
-        <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="ledenlijst.php">Ledenlijst</a>
-        <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/wijzigen.php">Lid wijzigen</a>
-        <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/postcode.php">Postcodes toevoegen</a>
-        <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/email.php">Email toevoegen</a>
-        <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/telefoon.php">Telefoon toevoegen</a>
-        <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/teams.php">Team samenstellen</a>
-        <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="remove.php">Teamleden verwijderen</a>
-      </nav>
-_END;
-
-$teamnamen = [];
-
-$query = "SELECT teamnaam FROM teams";
-$result = $conn->query($query);
-if(!$result) die('lidnr query failed');
-
-$rows = $result->num_rows;
-for($i = 0; $i < $rows; ++$i) {
-    $teamnaam = $result->fetch_array(MYSQLI_NUM);
-    array_push($teamnamen, $teamnaam[0]);
-}
-
-foreach($teamnamen as $teamnaam) {
+if(isset($_COOKIE['un']) &&
+   isset($_COOKIE['pw'])) {
     echo <<<_END
-    <h1>$teamnaam</h1>
+    <html>
+      <head>
+        <title>Vereniging</title>
+      </head>
+      <body>
+        <pre>
+          <div style="color: white; background-color: grey; display: flex; justify-content: center; padding: 30px; font-size: 30px;">
+            <b>Welkom bij de ledenlijst van onze vereniging</b>
+          </div>
+          <nav style="display: flex; justify-content: space-evenly; margin-bottom: 30px;">
+            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="home.php">Home</a>
+            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="ledenlijst.php">Ledenlijst</a>
+            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/wijzigen.php">Lid wijzigen</a>
+            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/postcode.php">Postcodes toevoegen</a>
+            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/email.php">Email toevoegen</a>
+            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/telefoon.php">Telefoon toevoegen</a>
+            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/teams.php">Team samenstellen</a>
+            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="remove.php">Teamleden verwijderen</a>
+          </nav>
     _END;
-    $lidnrs = [];
-    $query = "SELECT lidnummer FROM teamlid WHERE teamnaam='$teamnaam'";
+
+    $teamnamen = [];
+
+    $query = "SELECT teamnaam FROM teams";
     $result = $conn->query($query);
-    if(!$result) die('fatal error teamnaam[0]');
+    if(!$result) die('lidnr query failed');
+
     $rows = $result->num_rows;
     for($i = 0; $i < $rows; ++$i) {
-        $lidnr = $result->fetch_array(MYSQLI_NUM);
-        array_push($lidnrs, $lidnr);
+        $teamnaam = $result->fetch_array(MYSQLI_NUM);
+        array_push($teamnamen, $teamnaam[0]);
     }
-    foreach($lidnrs as $lid) {
-        $query = "SELECT voornaam, achternaam FROM leden WHERE lidnummer='$lid[0]'";
+
+    foreach($teamnamen as $teamnaam) {
+        echo <<<_END
+        <h1>$teamnaam</h1>
+        _END;
+        $lidnrs = [];
+        $query = "SELECT lidnummer FROM teamlid WHERE teamnaam='$teamnaam'";
         $result = $conn->query($query);
-        if(!$result) die('lorem error');
+        if(!$result) die('fatal error teamnaam[0]');
         $rows = $result->num_rows;
         for($i = 0; $i < $rows; ++$i) {
-            $naam = $result->fetch_array(MYSQLI_NUM);
-            echo $lid[0] . ' ' . sanitizeString($naam[0]) . ' ' .  sanitizeString($naam[1]) . '<br>';
-            echo <<<_END
-            <form method="post" action="">
-            <input type="submit" value="VERWIJDER LID VAN TEAM" style="background-color: indianred; color: white; border: none; border-radius: 5px; padding: 10px; cursor: pointer;">
-            <input type="hidden" name="deletenr" value=$lid[0]>
-            <input type="hidden" name="deletefromteam" value=$teamnaam>
-            </form>
-            _END;
+            $lidnr = $result->fetch_array(MYSQLI_NUM);
+            array_push($lidnrs, $lidnr);
         }
-    }
+        foreach($lidnrs as $lid) {
+            $query = "SELECT voornaam, achternaam FROM leden WHERE lidnummer='$lid[0]'";
+            $result = $conn->query($query);
+            if(!$result) die('lorem error');
+            $rows = $result->num_rows;
+            for($i = 0; $i < $rows; ++$i) {
+                $naam = $result->fetch_array(MYSQLI_NUM);
+                echo $lid[0] . ' ' . sanitizeString($naam[0]) . ' ' .  sanitizeString($naam[1]) . '<br>';
+                echo <<<_END
+                <form method="post" action="">
+                <input type="submit" value="VERWIJDER LID VAN TEAM" style="background-color: indianred; color: white; border: none; border-radius: 5px; padding: 10px; cursor: pointer;">
+                <input type="hidden" name="deletenr" value=$lid[0]>
+                <input type="hidden" name="deletefromteam" value=$teamnaam>
+                </form>
+                _END;
+            }
+        }
+    }   
+} else {
+  header("Location: home.php");
 }
 
 // delete from team

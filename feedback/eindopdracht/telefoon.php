@@ -5,7 +5,9 @@ require_once 'login.php';
 $conn = new mysqli($hn, $un, $pw, $db);
 if($conn->connect_error) die('Fatal error');
 
-echo <<<_END
+if(isset($_COOKIE['un']) &&
+   isset($_COOKIE['pw'])) {
+    echo <<<_END
     <html>
     <head>
         <title>Vereniging</title>
@@ -29,37 +31,40 @@ echo <<<_END
         <form action="" method="post" style="padding: 30px; background-color: cornflowerblue;"><pre>
         Selecteer van welk lid je de telefoon gegevens wil wijzigen:<br>
         <select name="edit" id="edit" required>
-_END;
+    _END;
 
-// set up query for leden dropdown
-$query = "SELECT * FROM leden";
-$result = $conn->query($query);
-if(!$result) die('lidnr query failed');
-$lidnrRows = $result->num_rows;
-for($i = 0; $i < $lidnrRows; ++$i) {
-$lidnrRow = $result->fetch_array(MYSQLI_NUM);
-// lidnr column is at lidnrRow[0]
-$lidnr = htmlspecialchars($lidnrRow[0]);
-// voornaam column is at lidnrRow[1]
-$voornaam = htmlspecialchars($lidnrRow[1]);
-// achternaam column is at lidnrRow[0]
-$achternaam = htmlspecialchars($lidnrRow[2]);
+    // set up query for leden dropdown
+    $query = "SELECT * FROM leden";
+    $result = $conn->query($query);
+    if(!$result) die('lidnr query failed');
+    $lidnrRows = $result->num_rows;
+    for($i = 0; $i < $lidnrRows; ++$i) {
+    $lidnrRow = $result->fetch_array(MYSQLI_NUM);
+    // lidnr column is at lidnrRow[0]
+    $lidnr = htmlspecialchars($lidnrRow[0]);
+    // voornaam column is at lidnrRow[1]
+    $voornaam = htmlspecialchars($lidnrRow[1]);
+    // achternaam column is at lidnrRow[0]
+    $achternaam = htmlspecialchars($lidnrRow[2]);
 
-// we echo the result inside of the loop
-echo <<<_END
-    <option value="$lidnr">#$lidnr $voornaam $achternaam</option>
-_END;
+    // we echo the result inside of the loop
+    echo <<<_END
+        <option value="$lidnr">#$lidnr $voornaam $achternaam</option>
+    _END;
+    }
+
+    // we echo rest of form
+    echo <<<_END
+    </select>
+            <input type="submit" value="Bekijk telefoon gegevens">
+    </form>
+    </pre>
+    </body>
+    </html>
+    _END;    
+} else {
+  header("Location: home.php");
 }
-
-// we echo rest of form
-echo <<<_END
-  </select>
-        <input type="submit" value="Bekijk telefoon gegevens">
-  </form>
-  </pre>
-  </body>
-  </html>
-_END;
 
 // check for chosen lid, save lidnr
 if(isset($_POST['edit'])) {
