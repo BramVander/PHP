@@ -7,25 +7,35 @@ if($conn->connect_error) die('Fatal error');
 
 if(isset($_COOKIE['un']) &&
    isset($_COOKIE['pw'])) {
+
+    $un_cookie = $_COOKIE['un'];
+    $pw_cookie = $_COOKIE['pw'];
+    $date_cookie = date( 'l Y-m-d', $_COOKIE['date']);
+
     echo <<<_END
     <html>
     <head>
-        <title>Vereniging</title>
+      <title>Vereniging</title>
     </head>
     <body>
-        <pre>
-        <div style="color: white; background-color: grey; display: flex; justify-content: center; padding: 30px; font-size: 30px;">
-            <b>Welkom bij de ledenlijst van onze vereniging</b>
+      <pre>
+        <div style="color: white; background-color: grey; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 30px;">
+          <b style="font-size: 30px;">Welkom bij de ledenlijst van onze vereniging</b>
+          <br>
+          <div class="tooltip">Show me my cookies
+            <span class="tooltiptext">Username: $un_cookie<br>Secret code: $pw_cookie<br>Date: $date_cookie</span>
+          </div>
         </div>
-        <nav style="display: flex; justify-content: space-evenly; margin-bottom: 50px;">
-            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="home.php">Home</a>
-            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="ledenlijst.php">Ledenlijst</a>
-            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/wijzigen.php">Lid wijzigen</a>
-            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/postcode.php">Postcodes toevoegen</a>
-            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/email.php">Email toevoegen</a>
-            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/telefoon.php">Telefoon toevoegen</a>
-            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/teams.php">Team samenstellen</a>
-            <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="remove.php">Teamleden verwijderen</a>
+        <nav style="display: flex; justify-content: space-evenly;">
+          <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="home.php">Home</a>
+          <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="ledenlijst.php">Ledenlijst</a>
+          <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/wijzigen.php">Lid wijzigen</a>
+          <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/postcode.php">Postcodes toevoegen</a>
+          <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/email.php">Email toevoegen</a>
+          <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/telefoon.php">Telefoon toevoegen</a>
+          <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="/feedback/eindopdracht/teams.php">Team samenstellen</a>
+          <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="remove.php">Teamleden verwijderen</a>
+          <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="logout.php">logout</a>
         </nav>
 
         <form action="" method="post" style="padding: 30px; background-color: cornflowerblue;"><pre>
@@ -83,14 +93,14 @@ if(isset($_POST['edit'])) {
        echo <<<_END
 
        <form method="post" action=''>
-        <input value="$telefoon">
-        <input type="hidden" name="delete" value=$telefoon>
-        <input type="submit" value="verwijderen" style="background-color: red; border: none; padding: 5px; cursor: pointer;">
+        <input value="$telefoon" name="updatePhone">
+        <input type="hidden" name="oldPhone" value="$telefoon">
+        <input type="submit" value="updaten" style="background-color: orange; border: none; padding: 5px; cursor: pointer;">
        </form>
        _END;
     }
     
-    // form for adding new email
+    // form for adding new phone
     echo <<<_END
     <form action='' method='post'>
     <label>Telefoon toevoegen:
@@ -102,7 +112,7 @@ if(isset($_POST['edit'])) {
     _END;
 }
 
-// check for adding email
+// check for adding phone
 if(isset($_POST['addPhone'])) {
     $newPhone = sanitizeString($_POST['addPhone']);
     $updateLid = sanitizeString($_POST['updateLid']);
@@ -117,7 +127,7 @@ if(isset($_POST['addPhone'])) {
     unset($_POST);
 }
 
-// check for submit on delete email
+// check for submit on delete phone
 if(isset($_POST['delete'])) {
     $phone = sanitizeString($_POST['delete']);
 
@@ -131,6 +141,29 @@ if(isset($_POST['delete'])) {
     unset($_POST);
 }
 
+// check for submit on update phone
+if(isset($_POST['updatePhone'])) {
+  $phone = sanitizeString($_POST['updatePhone']);
+  $oldPhone = sanitizeString($_POST['oldPhone']);
+  updatePhone($phone, $oldPhone);
+}
+
+function updatePhone($phone, $oldPhone) {
+  $hn = 'localhost';
+  $db = 'vereniging';
+  $un = 'vander';
+  $pw = 'mysql';
+
+  $conn = new mysqli($hn, $un, $pw, $db);
+  if($conn->connect_error) die('Fatal error');
+  $query = "UPDATE telefoon set telefoonnummer='$phone' WHERE telefoonnummer='$oldPhone';";
+  $result = $conn->query($query);
+  if(!$result) die('update phone query fail');
+  echo 'updated succesfully';
+  // prevent refresh data insertion
+  unset($_POST);
+}
+
 function sanitizeString($string) {
   if(get_magic_quotes_gpc())
       $string = stripslashes($string);
@@ -138,4 +171,31 @@ function sanitizeString($string) {
   $string = htmlentities($string);
   return $string;
 }
+
 ?>
+
+<style>
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 25%;
+  margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+</style>

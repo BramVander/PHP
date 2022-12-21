@@ -10,6 +10,11 @@ if(isset($_COOKIE['un']) &&
    isset($_COOKIE['pw'])) {
     $un = mysql_entities_fix_string($conn, $_COOKIE['un']);
     $pw = mysql_entities_fix_string($conn, $_COOKIE['pw']);
+
+    $un_cookie = $_COOKIE['un'];
+    $pw_cookie = $_COOKIE['pw'];
+    $date_cookie = date( 'l Y-m-d', $_COOKIE['date']);
+
     $query = "SELECT * FROM users WHERE username='$un'";
     $result = $conn->query($query);
     if(!$result) die('User not found');
@@ -27,7 +32,7 @@ if(isset($_COOKIE['un']) &&
         if($_COOKIE['un'] != $un && $_COOKIE['pw'] != $pw)
           setcookie('un', $un, time() + 60 * 60 * 24, '/');
           setcookie('pw', $pw, time() + 60 * 60 * 24, '/');
-          setcookie('time', time(), time() + 60 * 60 * 24, '/');
+          setcookie('date', time(), time() + 60 * 60 * 24, '/');
       } else die("Invalid username/pass combination");
     } else die("Invalid username/pass combination");
 } else {  
@@ -73,7 +78,7 @@ if(isset($_COOKIE['un']) &&
         echo '</div>';        // set cookies for credentials, duration max 24 hours
         setcookie('un', $un_temp, time() + 60 * 60 * 24, '/');
         setcookie('pw', $pw_temp, time() + 60 * 60 * 24, '/');
-        setcookie('time', time(), time() + 60 * 60 * 24, '/');
+        setcookie('date', time(), time() + 60 * 60 * 24, '/');
       } else die("Invalid username/pass combination");
     } else die("Invalid username/pass combination");
   } else {
@@ -82,7 +87,7 @@ if(isset($_COOKIE['un']) &&
     die("Please enter username and password");
     setcookie('un', '', time() - 60 * 60 * 24, '/');
     setcookie('pw', '', time() - 60 * 60 * 24, '/');
-    setcookie('time', '', time() - 60 * 60 * 24, '/');
+    setcookie('date', '', time() - 60 * 60 * 24, '/');
   }
 } $conn->close();
 
@@ -93,8 +98,12 @@ echo <<<_END
   </head>
   <body>
     <pre>
-      <div style="color: white; background-color: grey; display: flex; justify-content: center; padding: 30px; font-size: 30px;">
-        <b>Welkom bij de ledenlijst van onze vereniging</b>
+      <div style="color: white; background-color: grey; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 30px;">
+        <b style="font-size: 30px;">Welkom bij de ledenlijst van onze vereniging</b>
+        <br>
+        <div class="tooltip">Show me my cookies
+          <span class="tooltiptext">Username: $un_cookie<br>Secret code: $pw_cookie<br>Date: $date_cookie</span>
+        </div>
       </div>
       <nav style="display: flex; justify-content: space-evenly;">
         <a style="background-color: greenyellow; color: black; box-shadow: 5px 10px 8px #888888; text-decoration: none; border-radius: 5px; padding: 15px;" href="home.php">Home</a>
@@ -128,3 +137,31 @@ function mysql_fix_string($conn, $string)
   if (get_magic_quotes_gpc()) $string = stripslashes($string);
   return $conn->real_escape_string($string);
 }
+
+?>
+
+<style>
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 25%;
+  margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+</style>
