@@ -94,7 +94,6 @@ if(isset($_POST['edit'])) {
 }
 
 function showData($lidnr) {
-    // snap niet waarom ik deze opnieuw moet definen
     $hn = 'localhost';
     $db = 'vereniging';
     $un = 'vander';
@@ -129,7 +128,6 @@ if(isset($_POST['addEmail'])) {
 }
 
 function addEmail($email, $lidnr) {
-    // snap niet waarom ik deze opnieuw moet definen
     $hn = 'localhost';
     $db = 'vereniging';
     $un = 'vander';
@@ -153,7 +151,6 @@ if(isset($_POST['delete'])) {
 
 // delete email function
 function deleteEmail($email) {
-  // snap niet waarom ik deze opnieuw moet definen
   $hn = 'localhost';
   $db = 'vereniging';
   $un = 'vander';

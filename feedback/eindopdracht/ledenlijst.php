@@ -111,15 +111,13 @@ if(isset($_COOKIE['un']) &&
     if(!$result) die('delete query failed');
   }
 } else {
-header("Location: home.php");
+  header("Location: home.php");
 }
-
 
 // sanitize functions
 function mysql_entities_fix_string($conn, $string)
 {
   // after a $conn->close() we need to reopen connection
-  // this function doesnt seem to have acces so we reconnect manually
   $hn = 'localhost';
   $db = 'vereniging';
   $un = 'vander';
@@ -133,7 +131,6 @@ function mysql_entities_fix_string($conn, $string)
 function mysql_fix_string($conn, $string)
 {
   // after a $conn->close() we need to reopen connection
-  // this function doesnt seem to have acces so we reconnect manually
   $hn = 'localhost';
   $db = 'vereniging';
   $un = 'vander';
